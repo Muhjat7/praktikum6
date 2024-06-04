@@ -28,38 +28,40 @@ class Artikel extends BaseController
     }
 
     public function admin_index()
-    {
-        $title = 'Daftar Artikel';
-        $model = new ArtikelModel();
-        $artikel = $model->findAll();
-        return view('artikel/admin_index', compact('artikel', 'title'));
-    }
+{
+$title = 'Daftar Artikel';
+$q = $this->request->getVar('q') ?? '';
+$model = new ArtikelModel();
+$data = [
+'title' => $title,
+'q' => $q,
+'artikel' => $model->like('judul', $q)->paginate(10), # data dibatasi 10 record per halaman
+'pager' => $model->pager,
+];
+return view('artikel/admin_index', $data);
+}
 
-    public function add()
-    {
-        $validation = Services::validation();
-        $validation->setRules([
-            'judul' => 'required|string',
-            'isi' => 'required'
-        ]);
-
-        if (!$validation->withRequest($this->request)->run()) {
-            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
-        }
-
-        $judul = $this->request->getPost('judul');
-        $judul = is_array($judul) ? implode(' ', $judul) : $judul;  // Convert array to string if needed.
-        $judul = $judul ?? 'Default Title';  // Provide a default if null.
-
+public function add()
+{
+    // validasi data.
+    $validation = \Config\Services::validation();
+    $validation->setRules(['judul' => 'required']);
+    $isDataValid = $validation->withRequest($this->request)->run();
+    if ($isDataValid) {
+        $file = $this->request->getFile('gambar');
+        $file->move(ROOTPATH . 'public/gambar');
         $artikel = new ArtikelModel();
         $artikel->insert([
-            'judul' => $judul,
+            'judul' => $this->request->getPost('judul'),
             'isi' => $this->request->getPost('isi'),
-            'slug' => url_title($judul),
+            'slug' => url_title($this->request->getPost('judul')),
+            'gambar' => $file->getName(),
         ]);
-
         return redirect('admin/artikel');
     }
+    $title = "Tambah Artikel";
+    return view('artikel/form_add', compact('title'));
+}
     public function edit($id)
 {
     $artikel = new ArtikelModel();
