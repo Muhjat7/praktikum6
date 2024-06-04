@@ -23,7 +23,7 @@
 
 ## ` `**Sorce code View ajax index.php**
 ![](Aspose.Words.ea749257-f606-4f07-8ac8-f5e9c6669577.006.png)
-###Tampilan index.php
+### Tampilan index.php
 ![](Aspose.Words.ea749257-f606-4f07-8ac8-f5e9c6669577.007.png)
 # CodeIgniter 4 Framework
 
